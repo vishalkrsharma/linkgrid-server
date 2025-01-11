@@ -31,18 +31,14 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.pre('save', async (next) => {
-  const user = this as UserDocument;
-
-  if (!user.isModified('password')) return next();
+UserSchema.pre<UserDocument>('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
   try {
-    user.password = await bcrypt.hash(
-      user.password,
-      process.env.BCRYPT_SALT_ROUNDS,
-    );
-    return next();
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+    next();
   } catch (error) {
-    return next(error);
+    next(error);
   }
 });

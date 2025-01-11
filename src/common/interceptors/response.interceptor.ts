@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 import { ResponseDto } from 'src/common/dto/response-interceptor.dto';
 
 @Injectable()
-export class ResponseInterceptor<T>
+export class GlobalResponseInterceptor<T>
   implements NestInterceptor<T, ResponseDto<T>>
 {
   intercept(
@@ -18,7 +18,7 @@ export class ResponseInterceptor<T>
   ): Observable<ResponseDto<T>> {
     return next.handle().pipe(
       map((data) => {
-        return new ResponseDto(true, data, 'Request Successful', null);
+        return new ResponseDto(true, data, 'Request Successful');
       }),
     );
   }
