@@ -17,8 +17,12 @@ export class GlobalResponseInterceptor<T>
     next: CallHandler,
   ): Observable<ResponseDto<T>> {
     return next.handle().pipe(
-      map((data) => {
-        return new ResponseDto(true, data, 'Request Successful');
+      map((data: any) => {
+        const message = data?.message || 'Request Successful';
+        if (data?.message) {
+          delete data.message;
+        }
+        return new ResponseDto(true, data, message);
       }),
     );
   }

@@ -59,9 +59,9 @@ export class AuthService {
     const token = this.jwtService.sign({ userId: createdUser._id });
 
     return {
-      message: 'User successfully registered',
       user: createdUserWithoutPassword,
       token,
+      message: 'Signup successful',
     };
   }
 
@@ -87,9 +87,9 @@ export class AuthService {
       existingUser.toObject();
 
     return {
-      message: 'User successfully logged in',
       user: existingUserWithoutPassword,
       token,
+      message: 'Signin successful',
     };
   }
 }

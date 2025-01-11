@@ -13,7 +13,7 @@ export class UsersService {
   }
   async findOne(identifier: string) {
     const user = await this.userModel.findOne({
-      $or: [{ username: identifier }, { email: identifier }],
+      $or: [{ email: identifier }, { username: identifier }],
     });
     return user;
   }
