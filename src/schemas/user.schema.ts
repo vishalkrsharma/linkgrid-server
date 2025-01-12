@@ -18,6 +18,11 @@ export class User {
   name?: string;
 
   @Prop({
+    default: null,
+  })
+  imageUrl?: string;
+
+  @Prop({
     required: true,
     unique: true,
   })
