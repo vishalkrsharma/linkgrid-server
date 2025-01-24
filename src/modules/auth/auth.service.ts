@@ -4,12 +4,14 @@ import { JwtService } from '@nestjs/jwt';
 import { SigninDto } from 'src/modules/auth/dto/signin-dto';
 import bcrypt from 'bcryptjs';
 import { SignupDto } from 'src/modules/auth/dto/signup-dto';
+import { GridsService } from 'src/modules/grids/grids.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private gridService: GridsService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -58,6 +60,8 @@ export class AuthService {
 
     const token = this.jwtService.sign({ userId: createdUser._id });
 
+    this.gridService.createDefaultGrid(createdUser._id, createdUser.username);
+
     return {
       user: createdUserWithoutPassword,
       token,
@@ -69,6 +73,13 @@ export class AuthService {
     const { identifier, password } = signinDto;
 
     const existingUser = await this.usersService.findOne(identifier);
+
+    if (!existingUser) {
+      throw new HttpException(
+        { message: 'User not found' },
+        HttpStatus.CONFLICT,
+      );
+    }
 
     const checkPassword = await bcrypt.compare(password, existingUser.password);
 
