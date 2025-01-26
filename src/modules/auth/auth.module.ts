@@ -6,6 +6,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { GridsService } from 'src/modules/grids/grids.service';
 import { Grid, GridSchema } from 'src/schemas/grid.schema';
+import { ConfigService } from '@nestjs/config';
+import { AccessTokenStrategy } from 'src/modules/auth/strategies/accessToken.strategy';
+import { RefreshTokenStrategy } from 'src/modules/auth/strategies/refreshToken.strategy';
 
 @Module({
   imports: [
@@ -13,6 +16,13 @@ import { Grid, GridSchema } from 'src/schemas/grid.schema';
     MongooseModule.forFeature([{ name: Grid.name, schema: GridSchema }]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, GridsService],
+  providers: [
+    AuthService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+    UsersService,
+    GridsService,
+    ConfigService,
+  ],
 })
 export class AuthModule {}

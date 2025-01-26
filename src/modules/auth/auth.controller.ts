@@ -6,10 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from 'src/modules/auth/dto/signup-dto';
 import { SigninDto } from 'src/modules/auth/dto/signin-dto';
+import { AccessTokenGuard } from 'src/common/gaurds/access-token.guard';
+import { RefreshTokenGuard } from 'src/common/gaurds/refresh-token.guard';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +28,19 @@ export class AuthController {
   @Post('signup')
   signup(@Body() signupDto: SignupDto) {
     return this.authService.signup(signupDto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('logout')
+  logout(@Req() req: Request) {
+    this.authService.logout(req.user['_id']);
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Get('refresh')
+  refreshTokens(@Req() req: Request) {
+    const userId = req.user['_id'];
+    const refreshToken = req.user['refreshToken'];
+    return this.authService.refreshTokens(userId, refreshToken);
   }
 }

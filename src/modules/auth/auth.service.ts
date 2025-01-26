@@ -1,10 +1,18 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { SigninDto } from 'src/modules/auth/dto/signin-dto';
 import bcrypt from 'bcryptjs';
 import { SignupDto } from 'src/modules/auth/dto/signup-dto';
 import { GridsService } from 'src/modules/grids/grids.service';
+import { ConfigService } from '@nestjs/config';
+import { hashData } from 'src/common/lib/utils';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +20,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private gridService: GridsService,
+    private configService: ConfigService,
   ) {}
 
   async signup(signupDto: SignupDto) {
@@ -58,13 +67,16 @@ export class AuthService {
     const { password: createdUserPassword, ...createdUserWithoutPassword } =
       createdUser.toObject();
 
-    const token = this.jwtService.sign({ userId: createdUser._id });
+    const tokens = await this.getTokens(
+      createdUser._id.toString(),
+      createdUser.username,
+    );
 
     this.gridService.createDefaultGrid(createdUser._id, createdUser.username);
 
     return {
       user: createdUserWithoutPassword,
-      token,
+      tokens,
       message: 'Signup successful',
     };
   }
@@ -81,7 +93,7 @@ export class AuthService {
       );
     }
 
-    const checkPassword = await bcrypt.compare(password, existingUser.password);
+    const checkPassword = await argon2.verify(existingUser.password, password);
 
     if (!checkPassword) {
       throw new HttpException(
@@ -92,15 +104,72 @@ export class AuthService {
       );
     }
 
-    const token = this.jwtService.sign({ _id: existingUser._id });
+    const tokens = await this.getTokens(
+      existingUser._id.toString(),
+      existingUser.username,
+    );
 
     const { password: existingUserPassword, ...existingUserWithoutPassword } =
       existingUser.toObject();
 
     return {
       user: existingUserWithoutPassword,
-      token,
+      tokens,
       message: 'Signin successful',
+    };
+  }
+
+  async logout(userId: string) {
+    return this.usersService.update(userId, { refreshToken: null });
+  }
+
+  async refreshTokens(userId: string, refreshToken: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access Denied');
+    const refreshTokenMatches = await argon2.verify(
+      user.refreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
+    const tokens = await this.getTokens(user.id, user.username);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    await this.usersService.update(userId, {
+      refreshToken: await hashData(refreshToken),
+    });
+  }
+
+  async getTokens(userId: string, username: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          _id: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          _id: userId,
+          username,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: '7d',
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
     };
   }
 }

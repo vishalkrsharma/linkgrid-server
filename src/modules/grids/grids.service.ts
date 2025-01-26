@@ -16,9 +16,12 @@ export class GridsService {
   }
 
   async getByUserId(userId: string) {
+    console.log(userId);
     const grids = await this.gridModel.find({
       userId: new Types.ObjectId(userId),
     });
+
+    console.log(grids);
 
     return grids;
   }

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import bcrypt from 'bcryptjs';
+import * as argon2 from 'argon2';
+import { hashData } from 'src/common/lib/utils';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -37,6 +38,11 @@ export class User {
     type: String,
   })
   password: string;
+
+  @Prop({
+    type: String,
+  })
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -45,8 +51,7 @@ UserSchema.pre<UserDocument>('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   try {
-    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10;
-    this.password = await bcrypt.hash(this.password, saltRounds);
+    this.password = await hashData(this.password);
     next();
   } catch (error) {
     next(error);

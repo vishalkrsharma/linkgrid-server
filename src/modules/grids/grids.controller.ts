@@ -12,18 +12,17 @@ import {
 import { GridsService } from './grids.service';
 import { CreateGridDto } from './dto/create-grid.dto';
 import { UpdateGridDto } from './dto/update-grid.dto';
-import { AuthGaurd } from 'src/modules/auth/auth.gaurd';
-import { request } from 'http';
-import { User } from 'src/schemas/user.schema';
+import { AccessTokenGuard } from 'src/common/gaurds/access-token.guard';
 
 @Controller('grids')
-@UseGuards(AuthGaurd)
+@UseGuards(AccessTokenGuard)
 export class GridsController {
   constructor(private readonly gridsService: GridsService) {}
 
   @Get()
-  getByUserId(@Req() request: Request) {
-    const user = request['user'];
+  getByUserId(@Req() req: Request) {
+    console.log(req);
+    const user = req['user'];
     return this.gridsService.getByUserId(user._id);
   }
 

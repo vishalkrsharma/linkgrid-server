@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -45,4 +46,10 @@ export class CreateUserDto {
     message: 'Password must be at least 4 characters long',
   })
   password: string;
+
+  @IsOptional()
+  @IsString({
+    message: 'Refresh token must be a string',
+  })
+  refreshToken?: string;
 }
