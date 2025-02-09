@@ -21,7 +21,6 @@ export class GridsController {
 
   @Get()
   getByUserId(@Req() req: Request) {
-    console.log(req);
     const user = req['user'];
     return this.gridsService.getByUserId(user._id);
   }

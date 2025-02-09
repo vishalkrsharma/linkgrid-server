@@ -18,11 +18,11 @@ import { RefreshTokenStrategy } from 'src/modules/auth/strategies/refreshToken.s
   controllers: [AuthController],
   providers: [
     AuthService,
-    AccessTokenStrategy,
-    RefreshTokenStrategy,
     UsersService,
     GridsService,
     ConfigService,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
   ],
 })
 export class AuthModule {}

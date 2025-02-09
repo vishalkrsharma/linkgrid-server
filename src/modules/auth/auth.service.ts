@@ -71,6 +71,10 @@ export class AuthService {
       createdUser._id.toString(),
       createdUser.username,
     );
+    await this.updateRefreshToken(
+      createdUser._id.toString(),
+      tokens.refreshToken,
+    );
 
     this.gridService.createDefaultGrid(createdUser._id, createdUser.username);
 
@@ -108,6 +112,10 @@ export class AuthService {
       existingUser._id.toString(),
       existingUser.username,
     );
+    await this.updateRefreshToken(
+      existingUser._id.toString(),
+      tokens.refreshToken,
+    );
 
     const { password: existingUserPassword, ...existingUserWithoutPassword } =
       existingUser.toObject();
@@ -134,6 +142,7 @@ export class AuthService {
     if (!refreshTokenMatches) throw new ForbiddenException('Access Denied');
     const tokens = await this.getTokens(user.id, user.username);
     await this.updateRefreshToken(user.id, tokens.refreshToken);
+
     return tokens;
   }
 
@@ -152,7 +161,7 @@ export class AuthService {
         },
         {
           secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-          expiresIn: '15m',
+          expiresIn: '1m',
         },
       ),
       this.jwtService.signAsync(

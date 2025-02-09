@@ -22,4 +22,6 @@ export class SignupDto {
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(4, { message: 'Password must be at least 4 characters long' })
   password: string;
+
+  refreshToken?: string;
 }
