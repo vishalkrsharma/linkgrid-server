@@ -13,10 +13,17 @@ export class Grid {
   })
   userId: Types.ObjectId;
 
-  @Prop({ required: true, type: String })
+  @Prop({
+    required: true,
+    unique: true,
+    type: String,
+  })
   identifier: string;
 
-  @Prop({ type: [Link], default: [] })
+  @Prop({
+    type: [Link],
+    default: [],
+  })
   links: Link[];
 }
 

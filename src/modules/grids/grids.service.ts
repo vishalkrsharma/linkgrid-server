@@ -25,6 +25,14 @@ export class GridsService {
     return grids;
   }
 
+  async getGridByIdentifier(identifier: string) {
+    const grid = await this.gridModel
+      .findOne({ identifier })
+      .select('identifier links');
+
+    return grid;
+  }
+
   async getById(id: string) {
     const grid = await this.gridModel.findById(id);
 
