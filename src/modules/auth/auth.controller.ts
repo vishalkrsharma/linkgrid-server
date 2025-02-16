@@ -31,9 +31,9 @@ export class AuthController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Get('logout')
-  logout(@Req() req: Request) {
-    this.authService.logout(req.user['_id']);
+  @Get('signout')
+  signout(@Req() req: Request) {
+    this.authService.signout(req.user['_id']);
   }
 
   @UseGuards(RefreshTokenGuard)

@@ -25,6 +25,11 @@ export class GridsController {
     return this.gridsService.getByUserId(user._id);
   }
 
+  @Get(':id')
+  getById(@Param('id') id: string) {
+    return this.gridsService.getById(id);
+  }
+
   @Post()
   create(@Body() createGridDto: CreateGridDto) {
     return this.gridsService.create(createGridDto);
@@ -42,7 +47,9 @@ export class GridsController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGridDto: UpdateGridDto) {
-    return this.gridsService.update(+id, updateGridDto);
+    console.log(id);
+
+    return this.gridsService.update(id, updateGridDto);
   }
 
   @Delete(':id')

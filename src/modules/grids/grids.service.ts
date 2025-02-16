@@ -16,11 +16,19 @@ export class GridsService {
   }
 
   async getByUserId(userId: string) {
-    const grids = await this.gridModel.find({
-      userId: new Types.ObjectId(userId),
-    });
+    const grids = await this.gridModel
+      .find({
+        userId: new Types.ObjectId(userId),
+      })
+      .select('_id userId identifier');
 
     return grids;
+  }
+
+  async getById(id: string) {
+    const grid = await this.gridModel.findById(id);
+
+    return grid;
   }
 
   create(createGridDto: CreateGridDto) {
@@ -35,8 +43,10 @@ export class GridsService {
     return `This action returns a #${id} grid`;
   }
 
-  update(id: number, updateGridDto: UpdateGridDto) {
-    return `This action updates a #${id} grid`;
+  async update(id: string, updateGridDto: UpdateGridDto) {
+    await this.gridModel.findByIdAndUpdate(id, updateGridDto, { new: true });
+
+    return { message: 'Grid updated successfully' };
   }
 
   remove(id: number) {

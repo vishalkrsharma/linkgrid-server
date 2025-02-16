@@ -1,5 +1,7 @@
-import { IsNotEmpty, isNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
+import { LinkDto } from 'src/common/dto/link.dto';
 
 export class CreateGridDto {
   @IsString({
@@ -18,9 +20,7 @@ export class CreateGridDto {
   })
   identifier: string;
 
-  @IsString({
-    each: true,
-    message: 'Each link must be a string',
-  })
-  links: string[] = [];
+  @ValidateNested({ each: true })
+  @Type(() => LinkDto)
+  links: LinkDto[] = [];
 }

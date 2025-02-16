@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Link } from 'src/schemas/link.schema';
 
 export type GridDocument = HydratedDocument<Grid>;
 
@@ -15,8 +16,8 @@ export class Grid {
   @Prop({ required: true, type: String })
   identifier: string;
 
-  @Prop({ type: [String] })
-  links: string[];
+  @Prop({ type: [Link], default: [] })
+  links: Link[];
 }
 
 export const GridSchema = SchemaFactory.createForClass(Grid);
