@@ -52,7 +52,9 @@ export class GridsService {
   }
 
   async update(id: string, updateGridDto: UpdateGridDto) {
-    await this.gridModel.findByIdAndUpdate(id, updateGridDto, { new: true });
+    await this.gridModel
+      .findByIdAndUpdate(id, updateGridDto, { new: true })
+      .exec();
 
     return { message: 'Grid updated successfully' };
   }

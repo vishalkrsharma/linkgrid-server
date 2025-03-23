@@ -128,6 +128,7 @@ export class AuthService {
   }
 
   async signout(userId: string) {
+    console.log('aa');
     return this.usersService.update(userId, { refreshToken: null });
   }
 

@@ -33,7 +33,7 @@ export class UsersService {
     _id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<UserDocument> {
-    return this.userModel
+    return await this.userModel
       .findByIdAndUpdate(_id, updateUserDto, { new: true })
       .exec();
   }
